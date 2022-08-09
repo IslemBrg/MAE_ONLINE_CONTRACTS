@@ -28,19 +28,11 @@ export default function home() {
         }
       })
 
-    const handleLogout = async (event) => {
-        const res = await fetch('http://localhost:3000/api/logout')
-        const resp = await res.json()
-        router.push('/Login')
-    }
     
     
 
   return (
     <div>
-      <button color='success' onClick={handleLogout} class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full">
-            <b style={{fontSize: "1.7vh"}}>   Logout</b>
-        </button>
         <h1>bienvenu</h1><br/>
         <h2>M./Mme   {FirstName} {LastName}</h2>
     </div>
