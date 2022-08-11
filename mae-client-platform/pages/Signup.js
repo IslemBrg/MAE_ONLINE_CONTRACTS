@@ -17,12 +17,14 @@ export default function Login() {
       isLoggedIn()
     }, [])
     
+    const [CIN, setCIN] = useState('')
     const [FirstName, setFirstName] = useState('')
     const [LastName, setLastName] = useState('')
     const [Email, setEmail] = useState('');
 	  const [Password1, setPassword1] = useState('')
     const [Password2, setPassword2] = useState('')
 
+    const [CININV, setCININV] = useState(false)
     const [PasswordNotMatching, setPasswordNotMatching] = useState(false)
     const [EmptyMailInput, setEmptyMailInput] = useState(false)
     const [EmptyPassInput, setEmptyPassInput] = useState(false)
@@ -36,11 +38,17 @@ export default function Login() {
         setEmptyPassInput(false)
         setUserExist(false)
         setNameINV(false)
-        const First_Name = FirstName
-        const Last_Name = LastName
-        const mail = Email
+        setCININV(false)
+        const cin = CIN
+        const First_Name = FirstName[0].toUpperCase() + FirstName.slice(1).toLowerCase()
+        const Last_Name = LastName[0].toUpperCase() + LastName.slice(1).toLowerCase()
+        const mail = Email.toLowerCase()
         const pass = Password1
         const pass2 = Password2
+        if ((cin.length != 8)||(cin.length == 0) || (!isNumeric(cin))){
+          setCININV(true)
+          return;
+        }
         if(First_Name == ""){
           setNameINV(true)
           return;
@@ -64,6 +72,7 @@ export default function Login() {
         const config={
           method:"POST",
           body:JSON.stringify({
+            CIN:cin,
             FirstName:First_Name,
             LastName:Last_Name,
             mail:mail,
@@ -90,14 +99,20 @@ export default function Login() {
 		</div>
     <form>
 		<div class="space-y-4">
+            <input value={CIN} onChange={e => { setCIN(e.currentTarget.value); }} type="text" placeholder="Num CIN" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
             <input value={FirstName} onChange={e => { setFirstName(e.currentTarget.value); }} type="text" placeholder="First Name" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
             <input value={LastName} onChange={e => { setLastName(e.currentTarget.value); }} type="text" placeholder="Last Name" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
 			      <input value={Email} onChange={e => { setEmail(e.currentTarget.value); }} type="text" placeholder="Email Addres" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
-			      <input value={Password1} onChange={e => { setPassword1(e.currentTarget.value); }} type="text" placeholder="Password" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
-            <input value={Password2} onChange={e => { setPassword2(e.currentTarget.value); }} type="text" placeholder="Confirm Password" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
+			      <input value={Password1} onChange={e => { setPassword1(e.currentTarget.value); }} type="password" placeholder="Password" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
+            <input value={Password2} onChange={e => { setPassword2(e.currentTarget.value); }} type="password" placeholder="Confirm Password" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
 
     </div>
 			<div class="text-center mt-6">
+            {CININV && 
+              <div className='errorMessage'>
+              <p style={{padding:'1px',textAlign:'center'}}>Invalid CIN!</p>
+            </div>
+            }
             {PasswordNotMatching && 
               <div className='errorMessage'>
                 <p style={{padding:'1px',textAlign:'center'}}>passwords do not match!</p>

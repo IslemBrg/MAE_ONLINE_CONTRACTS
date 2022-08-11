@@ -1,4 +1,4 @@
-import mongodb, { MongoClient } from 'mongodb';
+import { MongoClient } from 'mongodb';
 import cookie from 'cookie'
 
 require("dotenv").config();
@@ -13,16 +13,16 @@ export default async (req, res) =>{
     }
     else {
     const login=JSON.parse(req.body)
-    const mail=login.login
+    const CIN=login.CIN
     const pass=login.pass
     MongoClient.connect(uri,(err,db)=>{
         if (err) throw err
         let currentDB = db.db("MAE")
-        //check if collection already exists
-        currentDB.collection("users").find({"mail":mail}).toArray((err,result)=>{
+        //check if user exists in collection users
+        currentDB.collection("users").find({"CIN":CIN}).toArray((err,result)=>{
             if (result.length>0){
-                if (result[0].pass == pass){
-                    const userToken = jwt.sign({mail}, process.env.ACCESS_TOKEN_SECRET,{expiresIn: '1h'})
+                if (result[0].Pass == pass){
+                    const userToken = jwt.sign({CIN}, process.env.ACCESS_TOKEN_SECRET,{expiresIn: '1h'})
                     res.setHeader('Set-Cookie', cookie.serialize('session_id',userToken,{
                         httpOnly: true,
                         sameSite: 'strict',

@@ -7,7 +7,7 @@ export default async (req, res) =>{
     res.setHeader('Set-Cookie', cookie.serialize('session_id','Deleted',{
         httpOnly: true,
         sameSite: 'strict',
-        maxAge: 1,
+        maxAge: 0,
         path:'/'
     }))
     res.status(200).json(200)

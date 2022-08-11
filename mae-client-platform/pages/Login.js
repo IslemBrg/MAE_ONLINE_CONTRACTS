@@ -6,10 +6,11 @@ import { useRouter } from 'next/router';
 
 
 export default function Login() {
-	const [EmptyMailInput, setEmptyMailInput] = useState(false)
+	const [EmptyCINInput, setEmptyCINInput] = useState(false)
   	const [EmptyPassInput, setEmptyPassInput] = useState(false)
   	const [InvalidCredentials, setInvalidCredentials] = useState(false)
-	const [Email, setEmail] = useState('');
+
+	const [CIN, setCIN] = useState('');
 	const [Password, setPassword] = useState('')
 	
     const router = useRouter()
@@ -25,16 +26,21 @@ export default function Login() {
 
 	}, [])
 	
+	function isNumeric(str) {
+        if (typeof str != "string") return false // we only process strings!  
+        return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+               !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+      }
 	
 	const handleSubmit = async (event) => {
 		event.preventDefault();
-		const Login = Email
+		const cin = CIN
 		const pass = Password
-		setEmptyMailInput(false)
+		setEmptyCINInput(false)
 		setEmptyPassInput(false)
 		setInvalidCredentials(false)
-		if(Login == ""){
-		  setEmptyMailInput(true)
+		if((cin.length == 0)||(cin.length != 8) || (!isNumeric(cin))){
+		  setEmptyCINInput(true)
 		  return;
 		}
 		if(pass == ""){
@@ -44,7 +50,7 @@ export default function Login() {
 		const config={
 		  method:"POST",
 		  body:JSON.stringify({
-			login:Login,
+			CIN:cin,
 			pass:pass
 		  })
 		}
@@ -72,13 +78,13 @@ export default function Login() {
 		</div>
 		<form>
 		<div class="space-y-4">
-			<input value={Email} onChange={e => { setEmail(e.currentTarget.value); }} id='login' type="text" placeholder="Email Addres" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
-			<input value={Password} onChange={e => { setPassword(e.currentTarget.value); }} id='pass' type="text" placeholder="Password" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
+			<input value={CIN} onChange={e => { setCIN(e.currentTarget.value); }} id='CIN' type="text" placeholder="num CIN" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
+			<input value={Password} onChange={e => { setPassword(e.currentTarget.value); }} id='pass' type="password" placeholder="Password" class="block text-sm py-3 px-4 rounded-lg w-full border outline-none" />
     </div>
 			<div class="text-center mt-6">
-			{EmptyMailInput && 
+			{EmptyCINInput && 
               <div className='errorMessage'>
-                <p style={{padding:'1px',textAlign:'center'}}>Please enter an email!</p>
+                <p style={{padding:'1px',textAlign:'center'}}>Please enter a valid CIN!</p>
               </div>
             }
             {EmptyPassInput && 
@@ -88,7 +94,7 @@ export default function Login() {
             }
             {InvalidCredentials && 
               <div className='errorMessage'>
-                <p style={{padding:'1px',textAlign:'center'}}>Incorrect Email or password!</p>
+                <p style={{padding:'1px',textAlign:'center'}}>Incorrect CIN or password!</p>
               </div>
             }
 				<button onClick={handleSubmit} class="py-3 w-64 text-xl text-white bg-green-400 rounded-2xl">Login Account</button>
