@@ -7,6 +7,7 @@ export default async (req, res) => {
         res.status(405).json('invalid request method!')
     }
     else{
+        let resp = {}
         MongoClient.connect(uri,(err,db)=>{
             let currentDB = db.db("MAE")
             currentDB.collection("cars").find({}).toArray((err,result)=>{
