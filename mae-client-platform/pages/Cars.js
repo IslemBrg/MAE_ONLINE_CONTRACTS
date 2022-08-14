@@ -17,7 +17,7 @@ export default function Cars() {
     }
 
     const getUserCars = async () => {
-        const res = await fetch(`http://localhost:3000/api/getCars`)
+        const res = await fetch(`http://localhost:3000/api/Car/getCars`)
         const cars = await res.json()
         return cars
     }
@@ -38,6 +38,7 @@ export default function Cars() {
     const [userLName, setuserLName] = useState("")
     const [updateCar, setupdateCar] = useState("")
     const [carToUpdate, setcarToUpdate] = useState({})
+    const [carToDelete, setcarToDelete] = useState("")
     
 
     const [emptyCIN, setemptyCIN] = useState(false)
@@ -80,6 +81,8 @@ export default function Cars() {
                 setuserLName(data[0].LastName)
                 setFirstName(userFName)
                 setLastName(userLName)
+            }else{
+                router.push('/Login')
             }
           })
 
@@ -109,7 +112,7 @@ export default function Cars() {
 
         const car = selectedManufacturer + " " + selectedCar
         const cin = CIN
-        const Name = FirstName + " " + LastName
+        const Name = userFName + " " + userLName
         const Serial = Serial1 + "-TUN-" + Serial2
         const Phone = ""
         if (phone2 != "") {
@@ -130,7 +133,7 @@ export default function Cars() {
             setemptyCar(true)
             return;
         }
-        if (FirstName == ""|| LastName == "") {
+        if (userFName == ""|| userLName == "") {
             setemptyName(true)
             return;
         }
@@ -166,7 +169,7 @@ export default function Cars() {
                 phone:Phone
             })
           }
-        const res = fetch(`http://localhost:3000/api/addCar`,config)
+        const res = fetch(`http://localhost:3000/api/Car/addCar`,config)
         res.then(data => {
             if (data.status == 200){
                 router.reload()
@@ -227,13 +230,13 @@ export default function Cars() {
         const config={
             method:"POST",
             body:JSON.stringify({
-                id:carToUpdate.id,
+                _id:carToUpdate._id,
                 cin:cin,
                 serial:Serial,
                 phone:Phone
             })
         }
-        const res = fetch(`http://localhost:3000/api/updateCar`,config)
+        const res = fetch(`http://localhost:3000/api/Car/updateCar`,config)
         res.then(data => {
             if (data.status == 200){
                 router.reload()
@@ -244,6 +247,24 @@ export default function Cars() {
                 }
             }
         }).catch(err => {console.log(err)})
+
+        }
+        const handleDelete = (event) => {
+
+            const config={
+                method:"POST",
+                body:JSON.stringify({
+                    id:carToDelete
+                })
+            }
+            const res = fetch(`http://localhost:3000/api/Car/deleteCar`,config)
+            res.then(data => {
+                if (data.status == 200){
+                    router.reload()
+                }
+            }
+            ).catch(err => {console.log(err)})
+
 
         }
     
@@ -472,30 +493,34 @@ export default function Cars() {
             <div style={{padding:"4rem",border:"1px solid black",borderRadius:"30px",backgroundColor:"white",boxShadow:"10px 10px 30px #888888",width:"100%"}}>
                 {userCars.map((car,index)=>{
                     return(
-                    <div key={index} style={{padding:"10px",border:"1px solid black",borderRadius:"30px",backgroundColor:"white",boxShadow:"10px 10px 30px #888888",width:"100%"}}>
-                        <button title='Delete Car' type="button" class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-red-800 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
-                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                        <a onClick={()=>{
-                            setcarToUpdate(car);
-                            setupdateCar("true");
-                            setSerial1(car.serial.split("-TUN-")[0]);
-                            setSerial2(car.serial.split("-TUN-")[1]);
-                            setphone1(car.phone.split(" // ")[0]);
-                            if(typeof car.phone.split(" // ")[1] !== "undefined"){
-                                setphone2(car.phone.split(" // ")[1]);
-                            }else{setphone2("")}
-                        }}>
-                        <img src={car.logo} width="50%" style={{borderBottom:"1px solid black",marginLeft:"25%"}}/>
-                        <div style={{textAlign:"center"}}>
-                            {car.car}<br/>
-                            {car.serial}<br/>
-                            {car.name}
-                        </div>
-                        </a>
-                    </div>
+                        <>
+                        {car.CIN == CIN &&
+                             <div key={index} style={{padding:"10px",border:"1px solid black",borderRadius:"30px",backgroundColor:"white",boxShadow:"10px 10px 30px #888888",width:"100%"}}>
+                             <button onClick={()=>{handleDelete();setcarToDelete(car._id.toString())}} title='Delete Car' type="button" class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-red-800 hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                                 <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                 </svg>
+                             </button>
+                             <a onClick={()=>{
+                                 setcarToUpdate(car);
+                                 setupdateCar("true");
+                                 setSerial1(car.serial.split("-TUN-")[0]);
+                                 setSerial2(car.serial.split("-TUN-")[1]);
+                                 setphone1(car.phone.split(" // ")[0]);
+                                 if(typeof car.phone.split(" // ")[1] !== "undefined"){
+                                     setphone2(car.phone.split(" // ")[1]);
+                                 }else{setphone2("")}
+                             }}>
+                             <img src={car.logo} width="50%" style={{borderBottom:"1px solid black",marginLeft:"25%"}}/>
+                             <div style={{textAlign:"center"}}>
+                                 {car.car}<br/>
+                                 {car.serial}<br/>
+                                 {car.name}
+                             </div>
+                             </a>
+                         </div>
+                        }
+                    </>
                     )
                 })}
             </div>
