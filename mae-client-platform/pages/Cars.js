@@ -1,9 +1,21 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router';
-import { set } from 'nprogress';
 
 export default function Cars() {
+    const [CIN, setCIN] = useState("")
+    const [userFName, setuserFName] = useState("")
+    const [userLName, setuserLName] = useState("")
+    const [FirstName, setFirstName] = useState("")
+    const [LastName, setLastName] = useState("")
+
+    const GetCurrentUser = async () => {
+        const res = await fetch(`http://localhost:3000/api/authed`)
+          const user = await res.json()
+          return(user)
+      }
+      
+
     const router = useRouter()
     const getManufacturers = async () => {
         const res = await fetch(`https://private-anon-4b46068cd1-carsapi1.apiary-mock.com//manufacturers`)
@@ -16,26 +28,29 @@ export default function Cars() {
         return cars
     }
 
-    const getUserCars = async () => {
-        const res = await fetch(`http://localhost:3000/api/Car/getCars`)
+    const getUserCars = async (cin) => {
+        const config = {
+            method: 'POST',
+            body:JSON.stringify({
+                cin:cin
+            })
+        }
+        console.log("cin: "+CIN)
+        const res = await fetch(`http://localhost:3000/api/Car/getCars`,config)
         const cars = await res.json()
         return cars
     }
 
+   
     const [manufacturers, setManufacturers] = useState([])
     const [cars, setCars] = useState([])
     const [userCars, setuserCars] = useState([])
     const [selectedManufacturer, setSelectedManufacturer] = useState("")
     const [selectedCar, setSelectedCar] = useState("")
-    const [FirstName, setFirstName] = useState("")
-    const [LastName, setLastName] = useState("")
     const [Serial1, setSerial1] = useState("")
     const [Serial2, setSerial2] = useState("")
     const [phone1, setphone1] = useState("")
     const [phone2, setphone2] = useState("")
-    const [CIN, setCIN] = useState("")
-    const [userFName, setuserFName] = useState("")
-    const [userLName, setuserLName] = useState("")
     const [updateCar, setupdateCar] = useState("")
     const [carToUpdate, setcarToUpdate] = useState({})
     const [carToDelete, setcarToDelete] = useState("")
@@ -51,45 +66,48 @@ export default function Cars() {
     const [phoneINV, setphoneINV] = useState(false)
     const [carRegistered, setcarRegistered] = useState(false)
 
-    const GetCurrentUser = async () => {
-        const res = await fetch(`http://localhost:3000/api/authed`)
-          const user = await res.json()
-          return(user)
-      }
+    
     useEffect(() => {
-        getCars().then(Cars => {
-            for (let i = 0; i < Cars.length; i++) {
-                let car =[{
-                    make: Cars[i].make,
-                    name: Cars[i].model,
-                }]
-                setCars(cars => [...cars, ...car])
-            }
-        }
-        ).catch(err => {console.log(err)})
-
-        getManufacturers().then(Manufacturers => {
-            for (let i = 0; i < Manufacturers.length; i++) {
-                setManufacturers(manufacturers => [...manufacturers, Manufacturers[i].name])
-            }
-        }).catch(err => {console.log(err)})
-
         GetCurrentUser().then(data => {
             if (data!=403 && data!=401){
-                setCIN(data[0].CIN)
-                setuserFName(data[0].FirstName)
-                setuserLName(data[0].LastName)
+                setCIN(data.CIN)
+                setuserFName(data.FirstName)
+                setuserLName(data.LastName)
                 setFirstName(userFName)
                 setLastName(userLName)
             }else{
                 router.push('/Login')
             }
           })
-
-        getUserCars().then(cars => {
-            setuserCars(cars)
-        })
+        
     }, [])
+    useEffect(() => {
+        if(CIN!=""){
+            
+            getCars().then(Cars => {
+                for (let i = 0; i < Cars.length; i++) {
+                    let car =[{
+                        make: Cars[i].make,
+                        name: Cars[i].model,
+                    }]
+                    setCars(cars => [...cars, ...car])
+                }
+            }
+            ).catch(err => {console.log(err)})
+
+            getManufacturers().then(Manufacturers => {
+                for (let i = 0; i < Manufacturers.length; i++) {
+                    setManufacturers(manufacturers => [...manufacturers, Manufacturers[i].name])
+                }
+            }).catch(err => {console.log(err)})
+
+            getUserCars(CIN).then(cars => {
+                setuserCars(cars)
+            })
+        }
+    }, [CIN])
+
+    
 
     function isNumeric(str) {
         if (typeof str != "string") return false // we only process strings!  
@@ -230,7 +248,7 @@ export default function Cars() {
         const config={
             method:"POST",
             body:JSON.stringify({
-                _id:carToUpdate._id,
+                id:carToUpdate._id,
                 cin:cin,
                 serial:Serial,
                 phone:Phone

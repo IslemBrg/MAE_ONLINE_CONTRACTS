@@ -22,8 +22,8 @@ export default function NavBar({authed}) {
       }
       GetCurrentUser().then(data => {
         if (data!=403 && data!=401){
-            setFirstName(data[0].FirstName)
-            setLastName(data[0].LastName)
+            setFirstName(data.FirstName)
+            setLastName(data.LastName)
         }
       })
   return (

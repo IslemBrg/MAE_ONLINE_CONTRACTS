@@ -22,7 +22,8 @@ export default async (req, res) =>{
         currentDB.collection("users").find({"CIN":CIN}).toArray((err,result)=>{
             if (result.length>0){
                 if (result[0].Pass == pass){
-                    const userToken = jwt.sign({CIN}, process.env.ACCESS_TOKEN_SECRET,{expiresIn: '1h'})
+                    console.log(result)
+                    const userToken = jwt.sign({"CIN":CIN,"FirstName":result[0].FirstName,"LastName":result[0].LastName,"Mail":result[0].Mail}, process.env.ACCESS_TOKEN_SECRET,{expiresIn: '1h'})
                     res.setHeader('Set-Cookie', cookie.serialize('session_id',userToken,{
                         httpOnly: true,
                         sameSite: 'strict',

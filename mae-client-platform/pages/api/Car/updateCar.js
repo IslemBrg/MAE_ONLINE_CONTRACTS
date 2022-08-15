@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 const uri = "mongodb://localhost:27017/MAE";
 
@@ -9,7 +9,7 @@ export default async (req, res) => {
     }
     else{
         const info=JSON.parse(req.body)
-        const _id=info._id
+        const id=info.id
         const CIN=info.cin
         const serial=info.serial
         const phone=info.phone
@@ -20,11 +20,11 @@ export default async (req, res) => {
                     if(result.length==0){
                         res.status(401).json(401)
                     }else{
-                        currentDB.collection("cars").find({"serial":serial}).toArray((err,result)=>{
+                        currentDB.collection("cars").find({"serial":serial,"CIN":CIN}).toArray((err,result)=>{
                             if(result.length>0){
                                 res.status(406).json(406)
                             }else{
-                                currentDB.collection("cars").updateOne({"_id":_id},{"$set":{"phone":phone,"serial":serial}},(err,result)=>{
+                                currentDB.collection("cars").updateOne({"_id":ObjectId(id)},{"$set":{"phone":phone,"serial":serial}},(err,result)=>{
                                     if (err) throw err
                                     res.status(200).json(200)
                                 })
