@@ -1,6 +1,13 @@
 import React from 'react'
 import { useState,useEffect } from 'react'
 import { useRouter } from 'next/router';
+import {
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
+} from '@chakra-ui/react'
 
 export default function home() {
     const [FirstName, setFirstName] = useState("")

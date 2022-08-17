@@ -1,7 +1,9 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router';
-
+import { Input } from '@chakra-ui/react'
+import {ImageUpload} from '../components/ImageUpload';
+  
 export default function Cars() {
     const [CIN, setCIN] = useState("")
     const [userFName, setuserFName] = useState("")
@@ -47,10 +49,13 @@ export default function Cars() {
     const [userCars, setuserCars] = useState([])
     const [selectedManufacturer, setSelectedManufacturer] = useState("")
     const [selectedCar, setSelectedCar] = useState("")
+    const [selectedCarObject, setselectedCarObject] = useState({})
     const [Serial1, setSerial1] = useState("")
     const [Serial2, setSerial2] = useState("")
     const [phone1, setphone1] = useState("")
     const [phone2, setphone2] = useState("")
+    const [BuyPrice, setBuyPrice] = useState(0)
+    const [MarketPrice, setMarketPrice] = useState(0)
     const [updateCar, setupdateCar] = useState("")
     const [carToUpdate, setcarToUpdate] = useState({})
     const [carToDelete, setcarToDelete] = useState("")
@@ -89,6 +94,8 @@ export default function Cars() {
                     let car =[{
                         make: Cars[i].make,
                         name: Cars[i].model,
+                        horsepower: Cars[i].horsepower,
+                        year: Cars[i].year,
                     }]
                     setCars(cars => [...cars, ...car])
                 }
@@ -106,7 +113,6 @@ export default function Cars() {
             })
         }
     }, [CIN])
-
     
 
     function isNumeric(str) {
@@ -285,8 +291,29 @@ export default function Cars() {
 
 
         }
+        useEffect(() => {
+            let horsepower = 0
+            let year = 0
+            for (let i = 0; i < cars.length; i++) {
+                if ((cars[i].name == selectedCar) && (cars[i].make == selectedManufacturer)) {
+                    horsepower = cars[i].horsepower
+                    year = cars[i].year
+                }
+            }
+            setselectedCarObject({
+                "make":selectedManufacturer,
+                "name":selectedCar,
+                "horsepower":horsepower,
+                "year":year,
+                "BuyPrice":0,
+                "MarketPrice":0,
+                "CirculationDate":"",
+            })
+        }, [selectedCar])
+        console.log(selectedCarObject)
     
   return (
+    <>
     <div class="grid md:grid-cols-2 md:gap-80">
         <div class="p-20">
       <div style={{padding:"4rem",border:"1px solid black",borderRadius:"30px",backgroundColor:"white",boxShadow:"10px 10px 30px #888888",width:"180%"}}>
@@ -295,7 +322,7 @@ export default function Cars() {
                     <h1 style={{fontSize:"2.5rem",marginLeft:"1%"}}>Register a new car</h1><br/><br/>
                     <div class="flex">
                     <div class="relative z-0 mb-6 w-50 group">
-                        <select value={selectedManufacturer} onChange={e => setSelectedManufacturer(e.target.value)} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <select value={selectedManufacturer} onChange={e =>{ setSelectedManufacturer(e.target.value)}} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-white dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500">
                             <option selected value="">Select a manufacturer</option>
                             {manufacturers.map((manufacturer, index) => (
                                 <option key={index} value={manufacturer}>{manufacturer}</option>
@@ -336,14 +363,28 @@ export default function Cars() {
                     </div>
                     <div class="grid md:grid-cols-2 md:gap-6">
                         <div class="relative z-0 mb-6 w-full group">
-                            <input  value={phone1} onChange={e => { setphone1(e.currentTarget.value); }} type="tel" name="floating_phone" id="floating_phone" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
-                            <label for="floating_phone" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Phone number 1</label>
+                            <input  value={selectedCarObject.horsepower} onChange={e => { setselectedCarObject({"make":selectedCarObject.make,"name":selectedCarObject.name,"horsepower":parseInt(e.currentTarget.value),"year":selectedCarObject.year,"BuyPrice":selectedCarObject.BuyPrice,"MarketPrice":selectedCarObject.MarketPrice,"CirculationDate":selectedCarObject.CirculationDate}); }} type="tel" name="floating_phone" id="floating_phone" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                            <label for="floating_phone" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Horsepower </label>
                         </div>
                         <div class="relative z-0 mb-6 w-full group">
-                            <input  value={phone2} onChange={e => { setphone2(e.currentTarget.value); }} type="text" name="floating_company" id="floating_company" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
-                            <label for="floating_company" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Phone number 2</label>
+                            <input  value={selectedCarObject.year} onChange={e => { setselectedCarObject({"make":selectedCarObject.make,"name":selectedCarObject.name,"horsepower":selectedCarObject.horsepower,"year":parseInt(e.currentTarget.value),"BuyPrice":selectedCarObject.BuyPrice,"MarketPrice":selectedCarObject.MarketPrice,"CirculationDate":selectedCarObject.CirculationDate}); }} type="text" name="floating_company" id="floating_company" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                            <label for="floating_company" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Year</label>
                         </div>
                     </div>
+                    <div class="grid md:grid-cols-2 md:gap-6">
+                        <div class="relative z-0 mb-6 w-full group">
+                            <input  value={selectedCarObject.MarketPrice} onChange={e => { setselectedCarObject({"make":selectedCarObject.make,"name":selectedCarObject.name,"horsepower":selectedCarObject.horsepower,"year":selectedCarObject.year,"BuyPrice":selectedCarObject.BuyPrice,"MarketPrice":parseInt(e.currentTarget.value),"CirculationDate":selectedCarObject.CirculationDate}) }} type="number" name="floating_phone" id="floating_phone" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                            <label for="floating_phone" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Market Price</label>
+                        </div>
+                        <div class="relative z-0 mb-6 w-full group">
+                            <input  value={selectedCarObject.BuyPrice} onChange={e => { setselectedCarObject({"make":selectedCarObject.make,"name":selectedCarObject.name,"horsepower":selectedCarObject.horsepower,"year":selectedCarObject.year,"BuyPrice":parseInt(e.currentTarget.value),"MarketPrice":selectedCarObject.BuyPrice,"CirculationDate":selectedCarObject.CirculationDate}) }} type="number" name="floating_phone" id="floating_phone" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                            <label for="floating_phone" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Market Price</label>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-3 md:gap-6">
+                    <Input value={selectedCarObject.CirculationDate} onChange={e => { setselectedCarObject({"make":selectedCarObject.make,"name":selectedCarObject.name,"horsepower":selectedCarObject.horsepower,"year":selectedCarObject.year,"BuyPrice":selectedCarObject.BuyPrice,"MarketPrice":selectedCarObject.BuyPrice,"CirculationDate":e.currentTarget.value}) }} placeholder="Select Date and Time" size="md" type="date" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"  />
+                    <ImageUpload/>
+                    </div><br/>
                     {emptyCIN&&
                         <div className='errorMessage'>
                         <p style={{padding:'1px',textAlign:'center'}}>You are not logged in!</p>
@@ -545,5 +586,6 @@ export default function Cars() {
         </div>
       </div>
     </div>
+  </>
   )
 }

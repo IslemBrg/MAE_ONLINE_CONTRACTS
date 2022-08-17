@@ -45,6 +45,7 @@ export default function Contracts() {
           })
         
     }, [])
+    
     useEffect(() => {
       if(CIN!=""){
         getUserCars(CIN).then(data => {
