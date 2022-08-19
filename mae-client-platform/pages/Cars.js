@@ -2,7 +2,14 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router';
 import { Input } from '@chakra-ui/react'
-import {ImageUpload} from '../components/ImageUpload';
+import ImageUploader from '../components/ImageUploader/ImageUploader';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
   
 export default function Cars() {
     const [CIN, setCIN] = useState("")
@@ -311,7 +318,17 @@ export default function Cars() {
             })
         }, [selectedCar])
         console.log(selectedCarObject)
-    
+
+        const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <>
     <div class="grid md:grid-cols-2 md:gap-80">
@@ -383,7 +400,21 @@ export default function Cars() {
                     </div>
                     <div class="grid md:grid-cols-3 md:gap-6">
                     <Input value={selectedCarObject.CirculationDate} onChange={e => { setselectedCarObject({"make":selectedCarObject.make,"name":selectedCarObject.name,"horsepower":selectedCarObject.horsepower,"year":selectedCarObject.year,"BuyPrice":selectedCarObject.BuyPrice,"MarketPrice":selectedCarObject.BuyPrice,"CirculationDate":e.currentTarget.value}) }} placeholder="Select Date and Time" size="md" type="date" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"  />
-                    <ImageUpload/>
+                    <div>
+      <Button variant="outlined" onClick={handleClickOpen}>
+        Open alert dialog
+      </Button>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogContent>
+          <ImageUploader/>
+        </DialogContent>
+      </Dialog>
+    </div>
                     </div><br/>
                     {emptyCIN&&
                         <div className='errorMessage'>
