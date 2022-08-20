@@ -59,13 +59,12 @@ export default function Cars() {
     const [selectedCarObject, setselectedCarObject] = useState({})
     const [Serial1, setSerial1] = useState("")
     const [Serial2, setSerial2] = useState("")
-    const [phone1, setphone1] = useState("")
-    const [phone2, setphone2] = useState("")
     const [BuyPrice, setBuyPrice] = useState(0)
     const [MarketPrice, setMarketPrice] = useState(0)
     const [updateCar, setupdateCar] = useState("")
     const [carToUpdate, setcarToUpdate] = useState({})
     const [carToDelete, setcarToDelete] = useState("")
+    const [Registration, setRegistration] = useState([])
     
 
     const [emptyCIN, setemptyCIN] = useState(false)
@@ -74,9 +73,13 @@ export default function Cars() {
     const [emptyName, setemptyName] = useState(false)
     const [emptySerial, setemptySerial] = useState(false)
     const [serialINV, setserialINV] = useState(false)
-    const [emptyPhone, setemptyPhone] = useState(false)
-    const [phoneINV, setphoneINV] = useState(false)
     const [carRegistered, setcarRegistered] = useState(false)
+    const [emptyHorsepower, setemptyHorsepower] = useState(false)
+    const [emptyYear, setemptyYear] = useState(false)
+    const [emptyBuyPrice, setemptyBuyPrice] = useState(false)
+    const [emptyMarketPrice, setemptyMarketPrice] = useState(false)
+    const [emptyRegistration, setemptyRegistration] = useState(false)
+    const [emptyDate, setemptyDate] = useState(false)
 
     
     useEffect(() => {
@@ -137,20 +140,25 @@ export default function Cars() {
         setemptyName(false)
         setemptySerial(false)
         setserialINV(false)
-        setemptyPhone(false)
-        setphoneINV(false)
         setcarRegistered(false)
+        setemptyHorsepower(false)
+        setemptyYear(false)
+        setemptyBuyPrice(false)
+        setemptyMarketPrice(false)
+        setemptyRegistration(false)
+        setemptyDate(false)
 
-        const car = selectedManufacturer + " " + selectedCar
+
+        const make = selectedCarObject.make
         const cin = CIN
-        const Name = userFName + " " + userLName
+        const Name = selectedCarObject.name
         const Serial = Serial1 + "-TUN-" + Serial2
-        const Phone = ""
-        if (phone2 != "") {
-            Phone = phone1 + " // " + phone2
-        }else{
-            Phone = phone1
-        }
+        const horsepower = selectedCarObject.horsepower
+        const year = selectedCarObject.year
+        const BuyPrice = selectedCarObject.BuyPrice
+        const MarketPrice = selectedCarObject.MarketPrice
+        const registration = Registration[0]
+        const Date = selectedCarObject.CirculationDate
 
         if (cin == "") {
             setemptyCIN(true)
@@ -176,28 +184,49 @@ export default function Cars() {
             setserialINV(true)
             return;
         }
-        if (Phone == "") {
-            setemptyPhone(true)
+        if (isNaN(horsepower)) {
+            setemptyHorsepower(true)
             return;
         }
-        if (phone1.length!=8 || !isNumeric(phone1)) {
-            setphoneINV(true)
+        if (isNaN(year)) {
+            setemptyYear(true)
             return;
         }
-        if (phone2.length!=0 && phone2.length!=8 && !isNumeric(phone2)) {
-            setphoneINV(true)
+        if (MarketPrice == ""|| isNaN(MarketPrice)|| MarketPrice==0) {
+            setemptyMarketPrice(true)
             return;
         }
+        if (BuyPrice == ""|| isNaN(BuyPrice)|| BuyPrice==0) {
+            setemptyBuyPrice(true)
+            return;
+        }
+        if (Date == "") {
+            setemptyDate(true)
+            return;
+        }
+        if (Date.length!=10) {
+            setemptyDate(true)
+            return;
+        }
+        if (Registration.length==0) {
+            setemptyRegistration(true)
+            return;
+        }
+
 
 
         const config={
             method:"POST",
             body:JSON.stringify({
                 cin:cin,
-                car:car,
+                make:make,
                 name:Name,
                 serial:Serial,
-                phone:Phone
+                horsepower:horsepower,
+                year:year,
+                BuyPrice:BuyPrice,
+                MarketPrice:MarketPrice,
+                //Registration missing
             })
           }
         const res = fetch(`http://localhost:3000/api/Car/addCar`,config)
@@ -314,7 +343,7 @@ export default function Cars() {
                 "year":year,
                 "BuyPrice":0,
                 "MarketPrice":0,
-                "CirculationDate":"",
+                "CirculationDate":""
             })
         }, [selectedCar])
         console.log(selectedCarObject)
@@ -325,9 +354,15 @@ export default function Cars() {
     setOpen(true);
   };
 
+  useEffect(() => {
+    setOpen(false);
+  }, [Registration])
+  
   const handleClose = () => {
     setOpen(false);
+    console.log(Registration)
   };
+
 
   return (
     <>
@@ -394,27 +429,30 @@ export default function Cars() {
                             <label for="floating_phone" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Market Price</label>
                         </div>
                         <div class="relative z-0 mb-6 w-full group">
-                            <input  value={selectedCarObject.BuyPrice} onChange={e => { setselectedCarObject({"make":selectedCarObject.make,"name":selectedCarObject.name,"horsepower":selectedCarObject.horsepower,"year":selectedCarObject.year,"BuyPrice":parseInt(e.currentTarget.value),"MarketPrice":selectedCarObject.BuyPrice,"CirculationDate":selectedCarObject.CirculationDate}) }} type="number" name="floating_phone" id="floating_phone" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
-                            <label for="floating_phone" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Market Price</label>
+                            <input  value={selectedCarObject.BuyPrice} onChange={e => { setselectedCarObject({"make":selectedCarObject.make,"name":selectedCarObject.name,"horsepower":selectedCarObject.horsepower,"year":selectedCarObject.year,"BuyPrice":parseInt(e.currentTarget.value),"MarketPrice":selectedCarObject.MarketPrice,"CirculationDate":selectedCarObject.CirculationDate}) }} type="number" name="floating_phone" id="floating_phone" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                            <label for="floating_phone" class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Buy Price</label>
                         </div>
                     </div>
-                    <div class="grid md:grid-cols-3 md:gap-6">
-                    <Input value={selectedCarObject.CirculationDate} onChange={e => { setselectedCarObject({"make":selectedCarObject.make,"name":selectedCarObject.name,"horsepower":selectedCarObject.horsepower,"year":selectedCarObject.year,"BuyPrice":selectedCarObject.BuyPrice,"MarketPrice":selectedCarObject.BuyPrice,"CirculationDate":e.currentTarget.value}) }} placeholder="Select Date and Time" size="md" type="date" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"  />
+                    <div class="grid md:grid-cols-2 md:gap-6">
+                        <div>
+                            Circulation start Date : <br/>
+                    <Input name="floating_date" id="floating_date" value={selectedCarObject.CirculationDate} onChange={e => { setselectedCarObject({"make":selectedCarObject.make,"name":selectedCarObject.name,"horsepower":selectedCarObject.horsepower,"year":selectedCarObject.year,"BuyPrice":selectedCarObject.BuyPrice,"MarketPrice":selectedCarObject.BuyPrice,"CirculationDate":e.currentTarget.value}) }} placeholder="Select Ciculation start Date" size="md" type="date" class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-black dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"  />                    
+                    </div>
                     <div>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open alert dialog
-      </Button>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogContent>
-          <ImageUploader/>
-        </DialogContent>
-      </Dialog>
-    </div>
+                        <Button variant="outlined" onClick={handleClickOpen}>
+                            {Registration.length !== 0?Registration[0].name:"Upload Registration document image"}
+                        </Button>
+                        <Dialog
+                            open={open}
+                            onClose={handleClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description"
+                        >
+                            <DialogContent>
+                            <ImageUploader file={Registration} onFileChange={setRegistration}/>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                     </div><br/>
                     {emptyCIN&&
                         <div className='errorMessage'>
@@ -446,21 +484,42 @@ export default function Cars() {
                             <p style={{padding:'1px',textAlign:'center'}}>Please enter a valid serial number!</p>
                         </div>
                     }
-                    {phoneINV &&
-                        <div className='errorMessage'>
-                            <p style={{padding:'1px',textAlign:'center'}}>Please enter a valid phone number!</p>
-                        </div>
-                    }
-                    {emptyPhone&&
-                        <div className='errorMessage'>
-                            <p style={{padding:'1px',textAlign:'center'}}>Please enter the car owner's phone number!</p>
-                        </div>
-                    }
                     {carRegistered&&
                         <div className='errorMessage'>
                             <p style={{padding:'1px',textAlign:'center'}}>this serial number is already registered!</p>
                         </div>
                     }
+                    {emptyHorsepower&&
+                        <div className='errorMessage'>
+                            <p style={{padding:'1px',textAlign:'center'}}>Please enter the car's horsepower!</p>
+                        </div>
+                    }
+                    {emptyYear&&
+                        <div className='errorMessage'>
+                            <p style={{padding:'1px',textAlign:'center'}}>Please enter the car's fabrication year!</p>
+                        </div>
+                    }
+                    {emptyBuyPrice&&
+                        <div className='errorMessage'>
+                            <p style={{padding:'1px',textAlign:'center'}}>Please enter the car's buy price!</p>
+                        </div>
+                    }
+                    {emptyMarketPrice&&
+                        <div className='errorMessage'>
+                            <p style={{padding:'1px',textAlign:'center'}}>Please enter the car's market price!</p>
+                        </div>
+                    }
+                    {emptyDate&&
+                        <div className='errorMessage'>
+                            <p style={{padding:'1px',textAlign:'center'}}>Please enter the car's circulation date!</p>
+                        </div>
+                    }
+                    {emptyRegistration&&
+                        <div className='errorMessage'>
+                            <p style={{padding:'1px',textAlign:'center'}}>Please upload the car's registration document!</p>
+                        </div>
+                    }
+
                     <button onClick={handleSubmit} type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
                     </form>
             

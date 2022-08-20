@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import FilePreview from "./FilePreview";
 import styles from "../../styles/DropZone.module.css";
-import Cars from "../../pages/Cars";
 
-const DropZone = ({ data, dispatch }) => {
+const DropZone = ({ data, dispatch, file, onFileChange }) => {
+  
+  
+  
   // onDragEnter sets inDropZone to true
   const handleDragEnter = (e) => {
     e.preventDefault();
@@ -66,36 +68,25 @@ const DropZone = ({ data, dispatch }) => {
       // this is to prevent duplicates
       files = files.filter((f) => !existingFiles.includes(f.name));
 
-      // dispatch action to add selected file or files to fileList
-      dispatch({ type: "ADD_FILE_TO_LIST", files });
+      // dispatch action to add selected file or files to fileList 
+      if(data.fileList.length > 0){
+        data.fileList = []
+        dispatch({ type: "ADD_FILE_TO_LIST", files });
+      }else{
+        dispatch({ type: "ADD_FILE_TO_LIST", files });
+      }
+        
     }
   };
 
   // to handle file uploads
   const uploadFiles = async () => {
-    //Close Overlay on Click
-    Cars.Cars.setOpen(false);
     // get the files from the fileList as an array
-    let files = data.fileList;
-    // initialize formData object
-    const formData = new FormData();
-    // loop over files and add to formData
-    files.forEach((file) => formData.append("files", file));
+    let files = data.fileList[0];
 
-    // Upload the files as a POST request to the server using fetch
-    // Note: /api/fileupload is not a real endpoint, it is just an example
-    const response = await fetch("/api/fileupload", {
-      method: "POST",
-      body: formData,
-    });
-
-    //successful file upload
-    if (response.ok) {
-      alert("Files uploaded successfully");
-    } else {
-      // unsuccessful file upload
-      alert("Error uploading files");
-    }
+    // send the file to the parent page
+    onFileChange([files]);
+    
   };
 
   return (
@@ -112,14 +103,14 @@ const DropZone = ({ data, dispatch }) => {
         <input
           id="fileSelect"
           type="file"
-          multiple
+          accept="image/*"
           className={styles.files}
           onChange={(e) => handleFileSelect(e)}
         />
-        <label htmlFor="fileSelect">You can select multiple Files</label>
+        <label htmlFor="fileSelect">Select Image</label>
 
         <h3 className={styles.uploadMessage}>
-          or drag &amp; drop your files here
+          or drag &amp; drop your Image here
         </h3>
       </div>
       {/* Pass the selectect or dropped files as props */}

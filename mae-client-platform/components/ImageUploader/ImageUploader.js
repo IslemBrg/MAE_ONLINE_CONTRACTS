@@ -3,7 +3,7 @@ import Head from "next/head";
 import DropZone from "./DropZone";
 import styles from "../../styles/Home.module.css";
 
-export default function ImageUploader() {
+export default function ImageUploader({file,onFileChange}) {
   // reducer function to handle state changes
   const reducer = (state, action) => {
     switch (action.type) {
@@ -22,18 +22,20 @@ export default function ImageUploader() {
     fileList: [],
   });
 
+
+
   return (
     <div className={styles.container}>
       <Head>
-        <title>Drag And Drop File Upload</title>
+        <title>Drag And Drop Images here</title>
         <meta name="description" content="Nextjs drag and drop file upload" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>Drag And Drop File Upload</h1>
+        <h1 className={styles.title}>Drag And Drop Images here</h1>
         {/* Pass state data and dispatch to the DropZone component */}
-        <DropZone data={data} dispatch={dispatch} />
+        <DropZone data={data} dispatch={dispatch} file={file} onFileChange={onFileChange} />
       </main>
 
       <footer className={styles.footer}>
