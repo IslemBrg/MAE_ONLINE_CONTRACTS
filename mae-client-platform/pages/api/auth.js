@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken')
 const uri = "mongodb://localhost:27017/MAE";
 
 
-
 export default async (req, res) =>{
     if (req.method=="GET"){
         res.status(405).json('invalid request method!')

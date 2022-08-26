@@ -9,6 +9,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import axios from 'axios';
 
   
 export default function Cars() {
@@ -214,32 +215,29 @@ export default function Cars() {
         }
 
 
+        console.log(Registration[0])
+        const formData = new FormData();
+        formData.append('CIN', cin)
+        formData.append('make',make)
+        formData.append('name',Name)
+        formData.append('serial',Serial)
+        formData.append('horsepower',horsepower)
+        formData.append('year',year)
+        formData.append('BuyPrice',BuyPrice)
+        formData.append('MarketPrice',MarketPrice)
+        formData.append('CirculDate',Date)
+        formData.append('file', registration);
+        axios.post('http://localhost:3000/api/Car/addCar', formData).then(res => {
+            console.log(res)
+            router.reload()
+        }).catch(err => {
+            if (err.response.status == 406){
+                setcarRegistered(true)
+            }
+        });
 
-        const config={
-            method:"POST",
-            body:JSON.stringify({
-                cin:cin,
-                make:make,
-                name:Name,
-                serial:Serial,
-                horsepower:horsepower,
-                year:year,
-                BuyPrice:BuyPrice,
-                MarketPrice:MarketPrice,
-                //Registration missing
-            })
-          }
-        const res = fetch(`http://localhost:3000/api/Car/addCar`,config)
-        res.then(data => {
-            if (data.status == 200){
-                router.reload()
-            }
-            else{
-                if(data.status == 406){
-                    setcarRegistered(true)
-                }
-            }
-        }).catch(err => {console.log(err)})
+        //const res = fetch(`http://localhost:3000/api/Car/addCar`,config)
+        
     }
     const handleUpdate = (event) => {
         event.preventDefault()
@@ -661,10 +659,10 @@ export default function Cars() {
                                  }else{setphone2("")}
                              }}>
                              <img src={car.logo} width="50%" style={{borderBottom:"1px solid black",marginLeft:"25%"}}/>
-                             <div style={{textAlign:"center"}}>
-                                 {car.car}<br/>
-                                 {car.serial}<br/>
-                                 {car.name}
+                             <div style={{textAlign:"center",marginTop:"3%"}}>
+                                 {car.make} {car.name}<br/>
+                                 model {car.year}<br/>
+                                 {car.serial}
                              </div>
                              </a>
                          </div>
